@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Catch-all default deny to enforce strict white-list security architecture
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global reusable security helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 1. Pets collection - public browsing, authenticated management
+    match /pets/{petId} {
+      allow read: if true; 
+      allow create: if isSignedIn() && isValidId(petId);
+      allow update: if isSignedIn() && isValidId(petId) && (
+        // Only allow status updates or info modifications
+        incoming().diff(existing()).affectedKeys().hasAny(['status', 'description', 'contactInfo'])
+      );
+      allow delete: if isSignedIn() && isValidId(petId);
+    }
+
+    // 2. Applications collection - strictly bounded to owner identity
+    match /applications/{applicationId} {
+      allow create: if isSignedIn() && isValidId(applicationId) && incoming().userId == request.auth.uid;
+      allow read, delete: if isSignedIn() && isValidId(applicationId) && existing().userId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(applicationId) && existing().userId == request.auth.uid && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'phone', 'reason'])
+      );
+    }
+
+    // 3. Favorites collection - strictly bounded to owner identity
+    match /favorites/{favoriteId} {
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow read, delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+  }
+}

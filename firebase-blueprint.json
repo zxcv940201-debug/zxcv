@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "Pet": {
+      "title": "Pet",
+      "description": "寵物認養詳細資訊",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "species": { "type": "string" },
+        "breed": { "type": "string" },
+        "age": { "type": "string" },
+        "gender": { "type": "string" },
+        "personalityTags": { 
+          "type": "array",
+          "description": "性格標籤，如親人、活潑等"
+        },
+        "imageUrl": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["待認養", "已認養", "審核中"] },
+        "contactInfo": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "species", "breed", "age", "gender", "personalityTags", "imageUrl"]
+    },
+    "Application": {
+      "title": "Application",
+      "description": "使用者提出的寵物認養申請",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "petId": { "type": "string" },
+        "petName": { "type": "string" },
+        "petImageUrl": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "phone": { "type": "string" },
+        "occupation": { "type": "string" },
+        "experience": { "type": "string" },
+        "reason": { "type": "string" },
+        "status": { "type": "string", "enum": ["已送出", "審核中", "已批准", "已拒絕"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["petId", "userId", "userName", "userEmail", "phone", "reason", "status"]
+    },
+    "Favorite": {
+      "title": "Favorite",
+      "description": "使用者收藏的寵物與使用者對應關聯",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "petId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "petId"]
+    }
+  },
+  "firestore": {
+    "/pets/{petId}": {
+      "schema": "Pet",
+      "description": "全站寵物認養資訊"
+    },
+    "/applications/{applicationId}": {
+      "schema": "Application",
+      "description": "全站使用者認養申請"
+    },
+    "/favorites/{favoriteId}": {
+      "schema": "Favorite",
+      "description": "使用者的個人寵物收藏"
+    }
+  }
+}

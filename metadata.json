@@ -1,0 +1,6 @@
+{
+  "name": "即時寵物認養資訊平台",
+  "description": "提供即時寵物資訊展示、豐富的品種與性格篩選、收藏功能及完整的認養申請與使用者系統。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
